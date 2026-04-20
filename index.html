@@ -789,11 +789,11 @@ footer.bottom a:hover { color: var(--accent); }
       <div class="subline">
         <div class="row reveal d1">
           <span class="prompt">&gt;</span>
-          <span class="text">trineapps &amp; friends. building small, opinionated software.</span>
+          <span class="text">trinepoint llc. building small, opinionated software.</span>
         </div>
         <div class="row reveal d2">
           <span class="prompt">&gt;</span>
-          <span class="text dim">est. 2026 · one-person studio · based in the usa</span>
+          <span class="text dim">est. 2026 · one-person studio</span>
         </div>
         <div class="row reveal d3">
           <span class="prompt">&gt;</span>
@@ -842,7 +842,7 @@ footer.bottom a:hover { color: var(--accent); }
           <span><span class="dim">$</span> whoami</span>
         </div>
         <div class="body contact">
-          <div class="line"><span class="prompt">&gt;</span><span class="k">mail</span><a href="mailto:hello@trinepoint.com">hello@trinepoint.com</a></div>
+          <div class="line"><span class="prompt">&gt;</span><span class="k">mail</span><a href="mailto:info@trinepoint.com">info@trinepoint.com</a></div>
           <div class="line"><span class="prompt">&gt;</span><span class="k">github</span><a href="https://github.com/trineapps" target="_blank" rel="noopener">github.com/trineapps</a></div>
           <div class="line"><span class="prompt">&gt;</span><span class="k">status</span><span class="green">accepting short collabs · reply within 48h</span></div>
         </div>
@@ -944,13 +944,15 @@ footer.bottom a:hover { color: var(--accent); }
     var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     var seq = [
-      { html: '<span class="ok">[ ok ]</span> trinepoint / <span class="key">sys 1.0</span> — boot sequence initiated', delay: 80 },
-      { html: '<span class="ok">[ ok ]</span> mount <span class="key">/apps</span> .......................... ok', delay: 140 },
-      { html: '<span class="ok">[ ok ]</span> init terminal <span class="dim">tty0 · 80×24 · color:amber</span>', delay: 140 },
-      { html: '<span class="ok">[ ok ]</span> uplink .................................. <span class="key">conn_ok</span>', delay: 140 },
-      { html: '<span class="ok">[ ok ]</span> manifest loaded <span class="dim">— 1 app registered</span>', delay: 140 },
-      { html: '<span class="ok">[ ok ]</span> start <span class="key">studiod</span> ........................ pid 001', delay: 140 },
-      { html: '<span class="key">&gt;&gt;&gt;</span> ready. welcome.', delay: 260 }
+      { html: '<span class="ok">[ ok ]</span> trinepoint / <span class="key">sys 1.0</span> — boot sequence initiated', delay: 200 },
+      { html: '<span class="dim">        probing hardware ...</span>', delay: 420 },
+      { html: '<span class="ok">[ ok ]</span> mount <span class="key">/apps</span> ........................... ok', delay: 460 },
+      { html: '<span class="ok">[ ok ]</span> init terminal <span class="dim">tty0 · 80×24 · color:amber</span>', delay: 460 },
+      { html: '<span class="ok">[ ok ]</span> uplink .................................. <span class="key">conn_ok</span> <span class="dim">(48ms)</span>', delay: 480 },
+      { html: '<span class="ok">[ ok ]</span> manifest loaded <span class="dim">— 1 app registered</span>', delay: 460 },
+      { html: '<span class="ok">[ ok ]</span> start <span class="key">studiod</span> ......................... pid 001', delay: 460 },
+      { html: '<span class="dim">        warming the tubes ...</span>', delay: 440 },
+      { html: '<span class="key">&gt;&gt;&gt;</span> ready. welcome.', delay: 560 }
     ];
 
     if (prefersReduced) {
@@ -983,7 +985,7 @@ footer.bottom a:hover { color: var(--accent); }
       total += step.delay;
       timers.push(setTimeout(function () { addLine(step.html); }, total));
     });
-    timers.push(setTimeout(finish, total + 420));
+    timers.push(setTimeout(finish, total + 800));
 
     function skip() {
       if (finished) return;
@@ -1124,7 +1126,7 @@ footer.bottom a:hover { color: var(--accent); }
       },
 
       contact: function () {
-        line('mail    <a href="mailto:hello@trinepoint.com">hello@trinepoint.com</a>');
+        line('mail    <a href="mailto:info@trinepoint.com">info@trinepoint.com</a>');
         line('github  <a href="https://github.com/trineapps" target="_blank" rel="noopener">github.com/trineapps</a>');
       },
 
