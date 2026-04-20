@@ -40,6 +40,7 @@
   --fg-faint: #3a2c17;
   --accent: #ff6a1c;
   --ok: #7ee06b;
+  --err: #ff5b5b;
   --rule: #f5c36b22;
   --rule-strong: #f5c36b66;
   --hover-bg: #f5c36b10;
@@ -61,8 +62,6 @@
 
   --sel-bg: #f5c36b;
   --sel-fg: #0e0b08;
-
-  --theme-name: "AMBER";
 }
 
 :root[data-theme="phosphor"] {
@@ -74,6 +73,7 @@
   --fg-faint: #0f2f18;
   --accent: #9dff5e;
   --ok: #d4ff7a;
+  --err: #ff5b5b;
   --rule: #4fdc6a22;
   --rule-strong: #4fdc6a66;
   --hover-bg: #4fdc6a12;
@@ -95,8 +95,6 @@
 
   --sel-bg: #9dff5e;
   --sel-fg: #020705;
-
-  --theme-name: "PHOSPHOR";
 }
 
 :root[data-theme="paper"] {
@@ -108,6 +106,7 @@
   --fg-faint: #c6bfa9;
   --accent: #c43a1c;
   --ok: #2c7a3f;
+  --err: #a31818;
   --rule: #1a161222;
   --rule-strong: #1a16125c;
   --hover-bg: #1a161210;
@@ -129,8 +128,6 @@
 
   --sel-bg: #1a1612;
   --sel-fg: #ece6d6;
-
-  --theme-name: "PAPER";
 }
 
 /* ============ BASE ============ */
@@ -205,6 +202,65 @@ button { cursor: none; background: none; border: none; color: inherit; font: inh
 .orange { color: var(--accent); }
 .green  { color: var(--ok); }
 
+/* ============ BOOT OVERLAY ============ */
+.boot {
+  position: fixed; inset: 0;
+  z-index: 9000;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "JetBrains Mono", monospace;
+  padding: clamp(16px, 4vw, 48px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow: hidden;
+  transition: opacity 360ms ease;
+}
+.boot.done {
+  opacity: 0;
+  pointer-events: none;
+}
+.boot .boot-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: clamp(20px, 4vw, 40px);
+  color: var(--fg-dim);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+.boot .boot-head .hd-brand { color: var(--fg-bright); }
+.boot .boot-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: clamp(12px, 1.5vw, 15px);
+}
+.boot .boot-lines .line {
+  opacity: 0;
+  transform: translateY(2px);
+  transition: opacity 220ms ease, transform 220ms ease;
+  white-space: nowrap;
+}
+.boot .boot-lines .line.in { opacity: 1; transform: none; }
+.boot .boot-lines .ok  { color: var(--ok); }
+.boot .boot-lines .err { color: var(--err); }
+.boot .boot-lines .key { color: var(--accent); }
+.boot .boot-lines .dim { color: var(--fg-dim); }
+.boot .boot-hint {
+  margin-top: auto;
+  font-size: 11px;
+  color: var(--fg-dim);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.boot .boot-hint b { color: var(--fg); border: 1px solid var(--fg-faint); padding: 1px 5px; font-weight: 500; }
+
+@media (prefers-reduced-motion: reduce) {
+  .boot { display: none; }
+}
+
 /* ============ CURSOR ============ */
 .cursor-x, .cursor-y {
   position: fixed;
@@ -243,7 +299,8 @@ button { cursor: none; background: none; border: none; color: inherit; font: inh
 @media (hover: none), (pointer: coarse) {
   .cursor-x, .cursor-y, .cursor-block { display: none; }
   body { cursor: auto; }
-  a, button { cursor: pointer; }
+  a, button, input { cursor: pointer; }
+  input[type="text"] { cursor: text; }
 }
 
 /* ============ LAYOUT ============ */
@@ -289,10 +346,7 @@ button { cursor: none; background: none; border: none; color: inherit; font: inh
   gap: 10px;
   align-items: center;
 }
-.topbar .mid .kbd {
-  display: inline-flex;
-  gap: 4px;
-}
+.topbar .mid .kbd { display: inline-flex; gap: 4px; }
 .topbar .mid .kbd b {
   display: inline-block;
   min-width: 16px;
@@ -342,9 +396,7 @@ button { cursor: none; background: none; border: none; color: inherit; font: inh
 }
 
 /* ============ HERO ============ */
-.hero {
-  padding: clamp(40px, 7vw, 96px) 0 clamp(28px, 5vw, 64px);
-}
+.hero { padding: clamp(40px, 7vw, 96px) 0 clamp(28px, 5vw, 64px); }
 .hero .banner {
   font-family: "VT323", "JetBrains Mono", monospace;
   font-size: clamp(64px, 16vw, 220px);
@@ -412,6 +464,7 @@ button { cursor: none; background: none; border: none; color: inherit; font: inh
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--fg-dim);
+  gap: 12px;
 }
 .panel > .head .title {
   color: var(--fg-bright);
@@ -526,6 +579,95 @@ button { cursor: none; background: none; border: none; color: inherit; font: inh
 }
 .contact .line a:hover { color: var(--accent); border-color: var(--accent); }
 
+/* ============ TERMINAL ============ */
+.term-body {
+  padding: 0 !important;
+  height: clamp(220px, 32vh, 360px);
+  display: flex;
+  flex-direction: column;
+}
+.term-out {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 14px clamp(14px, 2vw, 22px);
+  font-size: 13px;
+  line-height: 1.6;
+  scrollbar-width: thin;
+  scrollbar-color: var(--fg-faint) transparent;
+}
+.term-out::-webkit-scrollbar { width: 8px; }
+.term-out::-webkit-scrollbar-track { background: transparent; }
+.term-out::-webkit-scrollbar-thumb { background: var(--fg-faint); }
+
+.term-out .out-line { white-space: pre-wrap; word-break: break-word; }
+.term-out .out-echo .p { color: var(--accent); margin-right: 6px; }
+.term-out .out-echo .c { color: var(--fg-bright); }
+.term-out .out-sys { color: var(--fg-dim); }
+.term-out .out-info { color: var(--fg); }
+.term-out .out-err { color: var(--err); }
+.term-out .out-accent { color: var(--accent); }
+.term-out .out-ok { color: var(--ok); }
+.term-out .out-table {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto auto;
+  gap: 6px 14px;
+  padding: 4px 0;
+  font-size: 13px;
+}
+.term-out .out-table .c1 { color: var(--fg-dim); }
+.term-out .out-table .c2 { color: var(--fg-bright); }
+.term-out .out-table .c3 { color: var(--fg); }
+.term-out .out-table .c4 { color: var(--ok); letter-spacing: 0.08em; text-transform: uppercase; font-size: 11px; }
+.term-out .out-table .c4.wip { color: var(--fg-dim); }
+.term-out .out-table .c5 a { color: var(--accent); border-bottom: 1px solid var(--fg-faint); }
+.term-out .out-table .c5 a:hover { color: var(--fg-bright); }
+.term-out .out-help {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 4px 16px;
+  padding: 4px 0;
+}
+.term-out .out-help .k { color: var(--fg-bright); }
+.term-out .out-help .v { color: var(--fg); }
+.term-out .out-help .v .arg { color: var(--accent); }
+
+.term-input-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px clamp(14px, 2vw, 22px);
+  border-top: 1px dashed var(--rule);
+  background: linear-gradient(180deg, transparent, var(--hover-bg));
+}
+.term-input-line .p {
+  color: var(--accent);
+  font-size: 13px;
+  user-select: none;
+  white-space: nowrap;
+}
+.term-input-line input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: var(--fg-bright);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  letter-spacing: 0.01em;
+  padding: 0;
+  caret-color: var(--accent);
+  text-shadow: inherit;
+}
+.term-input-line input::placeholder { color: var(--fg-faint); }
+.term-input-line .blink {
+  width: 8px; height: 14px;
+  background: var(--fg-bright);
+  animation: caret-blink 1s steps(1, end) infinite;
+  flex-shrink: 0;
+}
+:root[data-theme="paper"] .term-input-line input { color: var(--fg); }
+
 /* ============ FOOTER ============ */
 footer.bottom {
   border-top: 1px solid var(--rule-strong);
@@ -590,6 +732,8 @@ footer.bottom a:hover { color: var(--accent); }
   .topbar .mid { display: none; }
   .topbar .bar { grid-template-columns: 1fr auto; }
   .topbar .right { font-size: 10px; gap: 10px; }
+  .term-out .out-table { grid-template-columns: auto 1fr auto; }
+  .term-out .out-table .c1, .term-out .out-table .c5 { display: none; }
 }
 </style>
 </head>
@@ -604,6 +748,16 @@ footer.bottom a:hover { color: var(--accent); }
 <div class="cursor-block" aria-hidden="true"></div>
 
 <div class="theme-flash" id="theme-flash" aria-hidden="true"></div>
+
+<!-- ============ BOOT OVERLAY ============ -->
+<div class="boot" id="boot" aria-hidden="true">
+  <div class="boot-head">
+    <span class="hd-brand">TRINEPOINT // SYS 1.0</span>
+    <span>POWER ON · <span id="boot-date"></span></span>
+  </div>
+  <div class="boot-lines" id="boot-lines"></div>
+  <div class="boot-hint">press <b>ANY KEY</b> to skip</div>
+</div>
 
 <header class="topbar">
   <div class="wrap bar">
@@ -695,6 +849,23 @@ footer.bottom a:hover { color: var(--accent); }
       </div>
     </section>
 
+    <!-- ============ TERMINAL ============ -->
+    <section class="reveal d4">
+      <div class="panel" id="term-panel">
+        <div class="head">
+          <span class="title">terminal</span>
+          <span><span class="dim">shell</span> sh — <span class="dim">type</span> <span class="bright">help</span> <span class="dim">· ↑/↓ history · ⏎ run</span></span>
+        </div>
+        <div class="body term-body">
+          <div class="term-out" id="term-out"></div>
+          <div class="term-input-line">
+            <span class="p">trineapps@sys1.0:~ $</span>
+            <input id="term-input" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off" aria-label="Terminal input" />
+          </div>
+        </div>
+      </div>
+    </section>
+
   </div>
 </main>
 
@@ -707,17 +878,53 @@ footer.bottom a:hover { color: var(--accent); }
 </footer>
 
 <script>
+(function () {
+  'use strict';
+
+  // ============================================================
+  // shared: theme apply (used by keyboard and terminal `theme`)
+  // ============================================================
+  var THEMES = ['amber', 'phosphor', 'paper'];
+  var LABELS = { amber: 'AMBER', phosphor: 'PHOSPHOR', paper: 'PAPER' };
+  var themeLabel = document.getElementById('theme-name');
+  var themeFlash = document.getElementById('theme-flash');
+  var themeButtons = document.querySelectorAll('[data-theme-btn]');
+  var flashTimer;
+
+  function applyTheme(name, announce) {
+    if (THEMES.indexOf(name) === -1) return false;
+    document.documentElement.setAttribute('data-theme', name);
+    try { localStorage.setItem('trinepoint-theme', name); } catch (e) {}
+    themeLabel.textContent = LABELS[name];
+    themeButtons.forEach(function (b) {
+      b.setAttribute('data-active', b.getAttribute('data-theme-btn') === name ? 'true' : 'false');
+    });
+    if (announce) {
+      themeFlash.textContent = 'COLOR // ' + LABELS[name];
+      themeFlash.classList.add('show');
+      clearTimeout(flashTimer);
+      flashTimer = setTimeout(function () { themeFlash.classList.remove('show'); }, 1100);
+    }
+    return true;
+  }
+  applyTheme(document.documentElement.getAttribute('data-theme') || 'amber', false);
+
+  // ============================================================
   // clock + uptime + year + build
+  // ============================================================
   (function () {
     var clock = document.getElementById('clock');
     var up = document.getElementById('uptime');
     var year = document.getElementById('year');
     var build = document.getElementById('build');
+    var bootDate = document.getElementById('boot-date');
     var started = Date.now();
-    year.textContent = new Date().getFullYear();
-    build.textContent = 'BUILD ' + String(new Date().getFullYear()).slice(-2) +
-      String(new Date().getMonth() + 1).padStart(2, '0') +
-      String(new Date().getDate()).padStart(2, '0');
+    var d0 = new Date();
+    year.textContent = d0.getFullYear();
+    build.textContent = 'BUILD ' + String(d0.getFullYear()).slice(-2) +
+      String(d0.getMonth() + 1).padStart(2, '0') +
+      String(d0.getDate()).padStart(2, '0');
+    bootDate.textContent = d0.toISOString().slice(0, 19).replace('T', ' ') + 'Z';
     function pad(n) { return String(n).padStart(2, '0'); }
     function tick() {
       var d = new Date();
@@ -728,59 +935,304 @@ footer.bottom a:hover { color: var(--accent); }
     tick(); setInterval(tick, 1000);
   })();
 
-  // theme switcher
+  // ============================================================
+  // boot sequence
+  // ============================================================
   (function () {
-    var THEMES = ['amber', 'phosphor', 'paper'];
-    var LABELS = { amber: 'AMBER', phosphor: 'PHOSPHOR', paper: 'PAPER' };
-    var label = document.getElementById('theme-name');
-    var flash = document.getElementById('theme-flash');
-    var buttons = document.querySelectorAll('[data-theme-btn]');
-    var flashTimer;
+    var boot = document.getElementById('boot');
+    var lines = document.getElementById('boot-lines');
+    var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    function apply(name, announce) {
-      if (THEMES.indexOf(name) === -1) return;
-      document.documentElement.setAttribute('data-theme', name);
-      try { localStorage.setItem('trinepoint-theme', name); } catch (e) {}
-      label.textContent = LABELS[name];
-      buttons.forEach(function (b) {
-        b.setAttribute('data-active', b.getAttribute('data-theme-btn') === name ? 'true' : 'false');
+    var seq = [
+      { html: '<span class="ok">[ ok ]</span> trinepoint / <span class="key">sys 1.0</span> — boot sequence initiated', delay: 80 },
+      { html: '<span class="ok">[ ok ]</span> mount <span class="key">/apps</span> .......................... ok', delay: 140 },
+      { html: '<span class="ok">[ ok ]</span> init terminal <span class="dim">tty0 · 80×24 · color:amber</span>', delay: 140 },
+      { html: '<span class="ok">[ ok ]</span> uplink .................................. <span class="key">conn_ok</span>', delay: 140 },
+      { html: '<span class="ok">[ ok ]</span> manifest loaded <span class="dim">— 1 app registered</span>', delay: 140 },
+      { html: '<span class="ok">[ ok ]</span> start <span class="key">studiod</span> ........................ pid 001', delay: 140 },
+      { html: '<span class="key">&gt;&gt;&gt;</span> ready. welcome.', delay: 260 }
+    ];
+
+    if (prefersReduced) {
+      boot.classList.add('done');
+      boot.style.display = 'none';
+      return;
+    }
+
+    var timers = [];
+    var finished = false;
+
+    function addLine(html) {
+      var el = document.createElement('div');
+      el.className = 'line';
+      el.innerHTML = html;
+      lines.appendChild(el);
+      requestAnimationFrame(function () { el.classList.add('in'); });
+    }
+
+    function finish() {
+      if (finished) return;
+      finished = true;
+      timers.forEach(function (t) { clearTimeout(t); });
+      boot.classList.add('done');
+      setTimeout(function () { boot.style.display = 'none'; }, 420);
+    }
+
+    var total = 0;
+    seq.forEach(function (step) {
+      total += step.delay;
+      timers.push(setTimeout(function () { addLine(step.html); }, total));
+    });
+    timers.push(setTimeout(finish, total + 420));
+
+    function skip() {
+      if (finished) return;
+      timers.forEach(function (t) { clearTimeout(t); });
+      lines.innerHTML = '';
+      seq.forEach(function (s) { addLine(s.html); });
+      setTimeout(finish, 160);
+    }
+    function onFirstInput(e) {
+      if (finished) return;
+      e.preventDefault();
+      skip();
+    }
+    window.addEventListener('keydown', onFirstInput, { once: true });
+    boot.addEventListener('click', onFirstInput, { once: true });
+  })();
+
+  // ============================================================
+  // terminal
+  // ============================================================
+  (function () {
+    var out = document.getElementById('term-out');
+    var input = document.getElementById('term-input');
+    var panel = document.getElementById('term-panel');
+    if (!out || !input) return;
+
+    var history = [];
+    var historyIdx = -1;
+
+    function scroll() {
+      out.scrollTop = out.scrollHeight;
+    }
+
+    function line(html, cls) {
+      var el = document.createElement('div');
+      el.className = 'out-line' + (cls ? ' ' + cls : '');
+      el.innerHTML = html;
+      out.appendChild(el);
+      scroll();
+      return el;
+    }
+
+    function echo(cmd) {
+      var el = document.createElement('div');
+      el.className = 'out-line out-echo';
+      var p = document.createElement('span');
+      p.className = 'p';
+      p.textContent = 'trineapps@sys1.0:~ $';
+      var c = document.createElement('span');
+      c.className = 'c';
+      c.textContent = ' ' + cmd;
+      el.appendChild(p); el.appendChild(c);
+      out.appendChild(el);
+      scroll();
+    }
+
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
       });
-      if (announce) {
-        flash.textContent = 'COLOR // ' + LABELS[name];
-        flash.classList.add('show');
-        clearTimeout(flashTimer);
-        flashTimer = setTimeout(function () { flash.classList.remove('show'); }, 1100);
+    }
+
+    // apps registry (editable)
+    var APPS = [
+      { id: '001', slug: 'stayspresent', name: 'stayspresent.com', url: 'https://stayspresent.com', desc: 'a gentle nudge back to the present moment.', status: 'live' },
+      { id: '002', slug: '—', name: '————————', url: null, desc: 'next one is compiling. check back soon.', status: 'wip' }
+    ];
+
+    // commands
+    var COMMANDS = {
+      help: function () {
+        var rows = [
+          ['help',               'show this help'],
+          ['ls',                 'list apps'],
+          ['open <span class="arg">&lt;name&gt;</span>',       'open an app in a new tab'],
+          ['theme <span class="arg">&lt;name&gt;</span>',      'switch theme (amber | phosphor | paper)'],
+          ['whoami',             'who is this'],
+          ['about',              'about trinepoint'],
+          ['contact',            'show contact info'],
+          ['date',               'current system date'],
+          ['echo <span class="arg">&lt;text&gt;</span>',       'print text'],
+          ['clear',              'clear the buffer']
+        ];
+        var grid = '<div class="out-help">';
+        rows.forEach(function (r) {
+          grid += '<span class="k">' + r[0] + '</span><span class="v">' + r[1] + '</span>';
+        });
+        grid += '</div>';
+        line('<span class="out-sys">available commands:</span>');
+        line(grid);
+      },
+
+      ls: function () {
+        var grid = '<div class="out-table">';
+        grid += '<span class="c1 dim">id</span><span class="c2 dim">name</span><span class="c3 dim">desc</span><span class="c4 dim">status</span><span class="c5 dim">goto</span>';
+        APPS.forEach(function (a) {
+          grid += '<span class="c1">' + a.id + '</span>';
+          grid += '<span class="c2">' + esc(a.name) + '</span>';
+          grid += '<span class="c3">' + esc(a.desc) + '</span>';
+          grid += '<span class="c4' + (a.status === 'wip' ? ' wip' : '') + '">' + a.status + '</span>';
+          grid += '<span class="c5">' + (a.url ? '<a href="' + a.url + '" target="_blank" rel="noopener">open →</a>' : '<span class="dim">—</span>') + '</span>';
+        });
+        grid += '</div>';
+        line('<span class="out-sys">total ' + APPS.length + '</span>');
+        line(grid);
+      },
+
+      open: function (args) {
+        if (!args.length) { line('usage: open &lt;app-name&gt;  (try <span class="out-accent">open stayspresent</span>)', 'out-err'); return; }
+        var q = args.join(' ').toLowerCase().replace(/\.com$/, '').trim();
+        var app = APPS.find(function (a) {
+          return a.slug === q || a.name.toLowerCase() === q || a.name.toLowerCase().replace(/\.com$/, '') === q;
+        });
+        if (!app || !app.url) { line('unknown app: <span class="out-err">' + esc(q) + '</span>', 'out-err'); return; }
+        line('opening <span class="out-accent">' + esc(app.url) + '</span> ...', 'out-info');
+        setTimeout(function () { window.open(app.url, '_blank', 'noopener'); }, 200);
+      },
+
+      theme: function (args) {
+        if (!args.length) { line('current theme: <span class="out-accent">' + LABELS[document.documentElement.getAttribute('data-theme')] + '</span>. try <span class="out-accent">theme phosphor</span>', 'out-info'); return; }
+        var name = args[0].toLowerCase();
+        if (applyTheme(name, true)) {
+          line('color set: <span class="out-accent">' + LABELS[name] + '</span>', 'out-ok');
+        } else {
+          line('unknown theme: <span class="out-err">' + esc(name) + '</span> (try amber | phosphor | paper)', 'out-err');
+        }
+      },
+
+      whoami: function () {
+        line('trinepoint llc', 'out-accent');
+        line('one-person software studio · est. 2026', 'out-info');
+      },
+
+      about: function () {
+        line('<span class="out-accent">trinepoint llc</span> — independent software studio');
+        line('est. 2026 · small, opinionated tools · shipping in public');
+        line('first app: <a href="https://stayspresent.com" target="_blank" rel="noopener">stayspresent.com</a>');
+      },
+
+      contact: function () {
+        line('mail    <a href="mailto:hello@trinepoint.com">hello@trinepoint.com</a>');
+        line('github  <a href="https://github.com/trineapps" target="_blank" rel="noopener">github.com/trineapps</a>');
+      },
+
+      date: function () {
+        line(new Date().toString(), 'out-info');
+      },
+
+      echo: function (args) {
+        line(esc(args.join(' ')));
+      },
+
+      clear: function () {
+        out.innerHTML = '';
+      },
+
+      exit: function () { line('nice try. it\'s the web.', 'out-info'); },
+      quit: function () { COMMANDS.exit(); },
+
+      // easter eggs
+      sudo: function () { line('nope.', 'out-err'); },
+      'rm': function (args) {
+        if (args[0] === '-rf' && args[1] === '/') {
+          line('destroying reality ...', 'out-err');
+          setTimeout(function () { line('... just kidding.', 'out-info'); }, 500);
+        } else {
+          line('rm: cannot remove: permission denied', 'out-err');
+        }
+      }
+    };
+
+    function execute(raw) {
+      var parts = raw.trim().split(/\s+/);
+      var cmd = parts[0].toLowerCase();
+      var args = parts.slice(1);
+      if (!cmd) return;
+      if (COMMANDS.hasOwnProperty(cmd)) {
+        COMMANDS[cmd](args);
+      } else {
+        line('command not found: <span class="out-err">' + esc(cmd) + '</span>  <span class="dim">(try `help`)</span>');
       }
     }
 
-    // init from current html attr
-    var current = document.documentElement.getAttribute('data-theme') || 'amber';
-    apply(current, false);
+    // boot message
+    line('<span class="out-sys">trinepoint sh v1.0 — type <span class="out-accent">help</span> to see available commands.</span>');
 
-    // keyboard 1/2/3
+    // input handling
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        var v = input.value;
+        input.value = '';
+        echo(v);
+        execute(v);
+        if (v.trim() && history[0] !== v) history.unshift(v);
+        historyIdx = -1;
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (historyIdx < history.length - 1) historyIdx++;
+        input.value = history[historyIdx] || '';
+        setTimeout(function () { input.setSelectionRange(input.value.length, input.value.length); }, 0);
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (historyIdx > 0) { historyIdx--; input.value = history[historyIdx] || ''; }
+        else { historyIdx = -1; input.value = ''; }
+      } else if (e.ctrlKey && e.key === 'l') {
+        e.preventDefault();
+        COMMANDS.clear();
+      } else if (e.ctrlKey && e.key === 'c') {
+        e.preventDefault();
+        echo(input.value);
+        line('^C', 'out-err');
+        input.value = '';
+      }
+    });
+
+    // click anywhere on panel focuses input
+    panel.addEventListener('click', function (e) {
+      if (e.target.tagName === 'A') return;
+      input.focus();
+    });
+  })();
+
+  // ============================================================
+  // global keyboard (theme + easter egg)
+  // ============================================================
+  (function () {
+    var buttons = document.querySelectorAll('[data-theme-btn]');
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { applyTheme(b.getAttribute('data-theme-btn'), true); });
+    });
     window.addEventListener('keydown', function (e) {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       var t = e.target;
       if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
-      if (e.key === '1') { e.preventDefault(); apply('amber', true); }
-      else if (e.key === '2') { e.preventDefault(); apply('phosphor', true); }
-      else if (e.key === '3') { e.preventDefault(); apply('paper', true); }
+      if (e.key === '1') { e.preventDefault(); applyTheme('amber', true); }
+      else if (e.key === '2') { e.preventDefault(); applyTheme('phosphor', true); }
+      else if (e.key === '3') { e.preventDefault(); applyTheme('paper', true); }
       else if (e.key === '/') {
         e.preventDefault();
         document.body.style.filter = 'invert(1) hue-rotate(180deg)';
         setTimeout(function () { document.body.style.filter = ''; }, 140);
       }
     });
-
-    // click fallback on the little number buttons
-    buttons.forEach(function (b) {
-      b.addEventListener('click', function () {
-        apply(b.getAttribute('data-theme-btn'), true);
-      });
-    });
   })();
 
+  // ============================================================
   // custom cursor
+  // ============================================================
   (function () {
     var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
     if (!fine) return;
@@ -793,8 +1245,9 @@ footer.bottom a:hover { color: var(--accent); }
       cy.style.transform = 'translate(' + (x - 0.5) + 'px,' + (y - 9) + 'px)';
       cb.style.transform = 'translate(' + x + 'px,' + y + 'px) translate(-50%,-50%)';
     });
-    function bind() {
-      var hoverables = document.querySelectorAll('a, button, [data-hover], .ls-row:not(.soon)');
+
+    function bind(root) {
+      var hoverables = (root || document).querySelectorAll('a, button, [data-hover], .ls-row:not(.soon), input');
       hoverables.forEach(function (el) {
         if (el.__bound) return;
         el.__bound = true;
@@ -803,7 +1256,15 @@ footer.bottom a:hover { color: var(--accent); }
       });
     }
     bind();
+
+    // rebind when terminal adds new anchors
+    var tout = document.getElementById('term-out');
+    if (tout) {
+      var mo = new MutationObserver(function () { bind(tout); });
+      mo.observe(tout, { childList: true, subtree: true });
+    }
   })();
+})();
 </script>
 </body>
 </html>
